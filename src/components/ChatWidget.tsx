@@ -17,6 +17,7 @@ const ChatWidget: React.FC = () => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isRobotAnimating, setIsRobotAnimating] = useState(false);
+  const [hasRobotAnimated, setHasRobotAnimated] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Initialize and persist state
@@ -46,14 +47,17 @@ const ChatWidget: React.FC = () => {
     // Initial delay before first animation
     const initialDelay = setTimeout(() => {
       setIsRobotAnimating(true);
-      setTimeout(() => setIsRobotAnimating(false), 4000); // Match animation duration
+      setTimeout(() => {
+        setIsRobotAnimating(false);
+        setHasRobotAnimated(true); // Set after animation completes
+      }, 3500); // Match animation duration
     }, 3000);
 
     // Periodic animation every 15 seconds
     const interval = setInterval(() => {
       if (!isOpen) {
         setIsRobotAnimating(true);
-        setTimeout(() => setIsRobotAnimating(false), 4000);
+        setTimeout(() => setIsRobotAnimating(false), 3500);
       }
     }, 15000);
 
@@ -97,7 +101,7 @@ const ChatWidget: React.FC = () => {
   if (!isOpen) {
     return (
       <>
-        <Robot isAnimating={isRobotAnimating} />
+        <Robot isAnimating={isRobotAnimating} hasAnimated={hasRobotAnimated} />
         <button
           onClick={() => setIsOpen(true)}
           className="fixed bottom-6 right-6 p-4 bg-[#111318] dark:bg-white text-white dark:text-black rounded-full shadow-2xl hover:scale-110 transition-all z-[100]"
