@@ -1,13 +1,25 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { MessageSquare, X, Minus, Send, Bot } from 'lucide-react';
-import { GoogleGenAI } from "@google/genai";
+import { MessageSquare, X, Minus, Send, Maximize2, RotateCcw } from 'lucide-react';
 import Robot from './Robot';
 
 interface Message {
   id: string;
-  role: 'user' | 'model';
+  role: 'user' | 'assistant';
   text: string;
+}
+
+const SESSION_ID_KEY = 'chat_session_id';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_KEY = import.meta.env.VITE_API_KEY;
+
+function getOrCreateSessionId(): string {
+  let sessionId = localStorage.getItem(SESSION_ID_KEY);
+  if (!sessionId || sessionId.length < 8) {
+    sessionId = crypto.randomUUID();
+    localStorage.setItem(SESSION_ID_KEY, sessionId);
+  }
+  return sessionId;
 }
 
 const ChatWidget: React.FC = () => {
@@ -19,6 +31,7 @@ const ChatWidget: React.FC = () => {
   const [isRobotAnimating, setIsRobotAnimating] = useState(false);
   const [hasRobotAnimated, setHasRobotAnimated] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const hasInitialized = useRef(false);
 
   // Initialize and persist state
   useEffect(() => {
@@ -67,36 +80,67 @@ const ChatWidget: React.FC = () => {
     };
   }, [isOpen]);
 
-  const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
+  const sendMessage = async (prompt: string, showUserMessage = true) => {
+    if (!prompt.trim() || isLoading) return;
 
-    const userMessage: Message = { id: Date.now().toString(), role: 'user', text: input };
-    setMessages(prev => [...prev, userMessage]);
+    if (showUserMessage) {
+      const userMessage: Message = { id: Date.now().toString(), role: 'user', text: prompt };
+      setMessages(prev => [...prev, userMessage]);
+    }
     setInput('');
     setIsLoading(true);
 
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-      const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
-        contents: [...messages, userMessage].map(m => ({
-          role: m.role,
-          parts: [{ text: m.text }]
-        })),
-        config: {
-          systemInstruction: "You are Brandon Wooding's AI assistant. You are professional, minimalist, and helpful. You know about his projects (Linear Redesign, Vercel Dashboard, UI Library) and his expertise in Frontend Engineering and Product Design. Keep responses concise and focused on professional inquiries.",
-        }
+      const sessionId = getOrCreateSessionId();
+      const response = await fetch(`${API_BASE_URL}/chat`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': API_KEY,
+        },
+        body: JSON.stringify({
+          sessionId,
+          prompt,
+        }),
       });
 
-      const modelText = response.text || "I'm sorry, I couldn't process that.";
-      setMessages(prev => [...prev, { id: (Date.now() + 1).toString(), role: 'model', text: modelText }]);
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        if (response.status === 401) {
+          throw new Error('Unauthorized: Invalid API key');
+        } else if (response.status === 400) {
+          throw new Error(errorData.error || 'Invalid request');
+        } else {
+          throw new Error(errorData.error || 'Something went wrong');
+        }
+      }
+
+      const data = await response.json();
+      const assistantText = data.text || "I'm sorry, I couldn't process that.";
+      setMessages(prev => [...prev, { id: (Date.now() + 1).toString(), role: 'assistant', text: assistantText }]);
     } catch (error) {
       console.error("Chat Error:", error);
-      setMessages(prev => [...prev, { id: (Date.now() + 1).toString(), role: 'model', text: "Connection error. Please try again later." }]);
+      const errorMessage = error instanceof Error ? error.message : "Connection error. Please try again later.";
+      setMessages(prev => [...prev, { id: (Date.now() + 1).toString(), role: 'assistant', text: errorMessage }]);
     } finally {
       setIsLoading(false);
     }
   };
+
+  const handleNewConversation = () => {
+    const newSessionId = crypto.randomUUID();
+    localStorage.setItem(SESSION_ID_KEY, newSessionId);
+    setMessages([]);
+    hasInitialized.current = false;
+  };
+
+  // Auto-send intro message when chat opens for the first time
+  useEffect(() => {
+    if (isOpen && messages.length === 0 && !hasInitialized.current && !isLoading) {
+      hasInitialized.current = true;
+      sendMessage('introduce yourself', false);
+    }
+  }, [isOpen, messages.length, isLoading]);
 
   if (!isOpen) {
     return (
@@ -104,7 +148,7 @@ const ChatWidget: React.FC = () => {
         <Robot isAnimating={isRobotAnimating} hasAnimated={hasRobotAnimated} />
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 p-4 bg-[#111318] dark:bg-white text-white dark:text-black rounded-full shadow-2xl hover:scale-110 transition-all z-[100]"
+          className="fixed bottom-6 right-6 p-4 bg-[#111318] dark:bg-white text-white dark:text-black rounded-full hover:scale-110 transition-transform z-[100]"
           aria-label="Open Chat"
         >
           <MessageSquare size={24} />
@@ -114,18 +158,21 @@ const ChatWidget: React.FC = () => {
   }
 
   return (
-    <div className={`fixed bottom-6 right-6 w-[85vw] md:w-[320px] z-[100] transition-all duration-300 ${isMinimized ? 'h-14' : 'h-[50vh] min-h-[400px]'} flex flex-col bg-white dark:bg-[#0f1115] border border-gray-100 dark:border-white/10 rounded-2xl shadow-2xl overflow-hidden backdrop-blur-xl`}>
+    <div className={`fixed bottom-6 right-6 w-[85vw] md:w-[320px] z-[100] ${isMinimized ? 'h-14' : 'h-[50vh] min-h-[400px]'} flex flex-col bg-white dark:bg-[#0f1115] border-2 border-gray-900 dark:border-white overflow-hidden`}>
       {/* Header */}
-      <div className="flex items-center justify-between p-3 border-b border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/5 shrink-0">
+      <div className="flex items-center justify-between p-3 border-b-2 border-black dark:border-white bg-black shrink-0">
         <div className="flex items-center gap-2">
-          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-          <span className="technical-mono text-[9px] uppercase tracking-widest font-bold">B. Wooding AI</span>
+          <div className="w-2 h-2 bg-primary animate-pulse" />
+          <span className="technical-mono text-[9px] uppercase tracking-widest font-bold text-white">Markus (Brandon's sidekick)</span>
         </div>
         <div className="flex items-center gap-1">
-          <button onClick={() => setIsMinimized(!isMinimized)} className="p-1.5 hover:bg-gray-200 dark:hover:bg-white/10 rounded transition-colors" title="Minimize">
-            <Minus size={14} />
+          <button onClick={handleNewConversation} className="p-1.5 hover:bg-white/20 border border-transparent hover:border-white text-white" title="New conversation">
+            <RotateCcw size={14} />
           </button>
-          <button onClick={() => setIsOpen(false)} className="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/20 text-gray-400 hover:text-red-500 rounded transition-colors" title="Close">
+          <button onClick={() => setIsMinimized(!isMinimized)} className="p-1.5 hover:bg-white/20 border border-transparent hover:border-white text-white" title={isMinimized ? "Maximize" : "Minimize"}>
+            {isMinimized ? <Maximize2 size={14} /> : <Minus size={14} />}
+          </button>
+          <button onClick={() => setIsOpen(false)} className="p-1.5 hover:bg-white/20 border border-transparent hover:border-white text-gray-400 hover:text-red-400" title="Close">
             <X size={14} />
           </button>
         </div>
@@ -135,18 +182,12 @@ const ChatWidget: React.FC = () => {
         <>
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4 scroll-smooth">
-            {messages.length === 0 && (
-              <div className="h-full flex flex-col items-center justify-center text-center opacity-40 space-y-2 py-8">
-                <Bot size={28} />
-                <p className="text-[9px] technical-mono uppercase tracking-widest">Minimal assistant ready</p>
-              </div>
-            )}
             {messages.map((m) => (
               <div key={m.id} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[90%] p-3 rounded-xl text-xs leading-relaxed ${
-                  m.role === 'user' 
-                    ? 'bg-primary text-white shadow-sm' 
-                    : 'bg-gray-100 dark:bg-white/5 text-gray-800 dark:text-gray-200 border border-gray-50 dark:border-white/5'
+                <div className={`max-w-[90%] p-3 text-xs leading-relaxed ${
+                  m.role === 'user'
+                    ? 'bg-primary text-white border-2 border-primary'
+                    : 'bg-gray-100 dark:bg-black text-gray-800 dark:text-gray-200 border-2 border-gray-900 dark:border-white'
                 }`}>
                   {m.text}
                 </div>
@@ -154,10 +195,10 @@ const ChatWidget: React.FC = () => {
             ))}
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-gray-100 dark:bg-white/5 p-3 rounded-xl flex gap-1">
-                  <span className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" />
-                  <span className="w-1 h-1 bg-gray-400 rounded-full animate-bounce [animation-delay:0.2s]" />
-                  <span className="w-1 h-1 bg-gray-400 rounded-full animate-bounce [animation-delay:0.4s]" />
+                <div className="bg-gray-100 dark:bg-black p-3 border-2 border-gray-900 dark:border-white flex gap-1">
+                  <span className="w-1 h-1 bg-gray-400 animate-bounce" />
+                  <span className="w-1 h-1 bg-gray-400 animate-bounce [animation-delay:0.2s]" />
+                  <span className="w-1 h-1 bg-gray-400 animate-bounce [animation-delay:0.4s]" />
                 </div>
               </div>
             )}
@@ -165,21 +206,21 @@ const ChatWidget: React.FC = () => {
           </div>
 
           {/* Footer */}
-          <form 
-            onSubmit={(e) => { e.preventDefault(); handleSend(); }}
-            className="p-3 bg-gray-50/50 dark:bg-white/5 border-t border-gray-100 dark:border-white/5 flex gap-2 shrink-0"
+          <form
+            onSubmit={(e) => { e.preventDefault(); sendMessage(input); }}
+            className="p-3 bg-gray-50 dark:bg-black border-t-2 border-gray-900 dark:border-white flex gap-2 shrink-0"
           >
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask me anything..."
-              className="flex-1 bg-white dark:bg-[#16181d] border border-gray-200 dark:border-white/10 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-primary transition-colors placeholder:opacity-50"
+              className="flex-1 bg-white dark:bg-[#16181d] border-2 border-gray-900 dark:border-white px-3 py-2 text-xs focus:outline-none focus:border-primary placeholder:opacity-50"
             />
-            <button 
+            <button
               type="submit"
               disabled={!input.trim() || isLoading}
-              className="p-2 bg-primary text-white rounded-xl disabled:opacity-50 transition-all hover:brightness-110 active:scale-95 flex items-center justify-center"
+              className="p-2 bg-primary text-white border-2 border-primary disabled:opacity-50 hover:bg-opacity-90 flex items-center justify-center"
             >
               <Send size={14} />
             </button>

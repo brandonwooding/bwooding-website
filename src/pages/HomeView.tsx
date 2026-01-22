@@ -25,17 +25,23 @@ const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
             <IconSocialLink
               icon={<LinkedinIcon className="w-7 h-7" />}
               label="LinkedIn"
-              href="#"
+              href="https://www.linkedin.com/in/brandonwooding"
+              target="_blank"
+              rel="noopener noreferrer"
             />
             <IconSocialLink
               icon={<GithubIcon className="w-7 h-7" />}
               label="GitHub"
-              href="#"
+              href="https://www.github.com/brandonwooding"
+              target="_blank"
+              rel="noopener noreferrer"
             />
             <IconSocialLink
               icon={<CvIcon className="w-7 h7" />}
               label="CV"
-              href="#"
+              href="/cv.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
             />
           </div>
 
@@ -45,21 +51,21 @@ const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
         <div className="w-8 h-[1px] bg-gray-200 dark:bg-gray-800 mx-auto"></div>
 
         <nav className="flex flex-col items-center justify-center gap-8">
-          <button 
+          <button
             onClick={() => onNavigate(Page.Projects)}
-            className="text-xl md:text-2xl font-light hover:text-primary transition-all lowercase tracking-tight duration-500"
+            className="technical-mono text-xl md:text-2xl font-light hover:text-primary lowercase tracking-tight"
           >
             projects
           </button>
-          <button 
+          <button
             onClick={() => onNavigate(Page.Blog)}
-            className="text-xl md:text-2xl font-light hover:text-primary transition-all lowercase tracking-tight duration-500"
+            className="technical-mono text-xl md:text-2xl font-light hover:text-primary lowercase tracking-tight"
           >
             blog
           </button>
-          <button 
+          <button
             onClick={() => onNavigate(Page.Contact)}
-            className="text-xl md:text-2xl font-light hover:text-primary transition-all lowercase tracking-tight duration-500"
+            className="technical-mono text-xl md:text-2xl font-light hover:text-primary lowercase tracking-tight"
           >
             contact
           </button>
@@ -69,16 +75,18 @@ const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
   );
 };
 
-const IconSocialLink: React.FC<{ icon: React.ReactNode; label: string; href: string }> = ({ icon, label, href }) => (
-  <a 
-    className="relative group flex flex-col items-center text-gray-400 hover:text-primary transition-all duration-300" 
+const IconSocialLink: React.FC<{ icon: React.ReactNode; label: string; href: string; target?: string; rel?: string }> = ({ icon, label, href, target, rel }) => (
+  <a
+    className="relative group flex flex-col items-center text-gray-400 hover:text-primary"
     href={href}
+    target={target}
+    rel={rel}
     aria-label={label}
   >
-    <div className="p-2 transition-transform duration-300 group-hover:-translate-y-1">
+    <div className="p-2">
       {icon}
     </div>
-    <span className="absolute -bottom-6 text-[9px] uppercase tracking-[0.2em] font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+    <span className="absolute -bottom-6 text-[9px] uppercase tracking-[0.2em] font-bold opacity-0 group-hover:opacity-100 pointer-events-none">
       {label}
     </span>
   </a>

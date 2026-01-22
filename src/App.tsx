@@ -2,8 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { Page } from '../types';
 import HomeView from './pages/HomeView';
-import ProjectsView from './pages/ProjectsView';
-import BlogView from './pages/BlogView';
+import ProjectsPlaceholder from './pages/ProjectsPlaceholder';
+import BlogPlaceholder from './pages/BlogPlaceholder';
 import ContactView from './pages/ContactView';
 import Layout from './layout/Layout';
 import ChatWidget from './components/ChatWidget';
@@ -32,9 +32,9 @@ const App: React.FC = () => {
   const renderContent = () => {
     switch (currentPage) {
       case Page.Projects:
-        return <ProjectsView />;
+        return <ProjectsPlaceholder />;
       case Page.Blog:
-        return <BlogView />;
+        return <BlogPlaceholder />;
       case Page.Contact:
         return <ContactView />;
       default:
