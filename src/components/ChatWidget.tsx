@@ -9,6 +9,32 @@ interface Message {
   text: string;
 }
 
+type ChatState = 'active' | 'sleeping' | 'rate_limited';
+
+// Witty messages - add more options to each array for random selection
+const WITTY_MESSAGES = {
+  sleeping: {
+    initial: [
+      "Sorry, I'm sleeping - please check back later"
+    ],
+    followUp: [
+      "zzz"
+    ]
+  },
+  rateLimited: {
+    initial: [
+      "Sorry, Brandon said I can't yap forever. He mentioned something about rate limits or API credits, I can't remember... Anyways, it's been nice, I'm going to nap now :)"
+    ],
+    followUp: [
+      "zzz"
+    ]
+  }
+};
+
+const getRandomMessage = (messages: string[]): string => {
+  return messages[Math.floor(Math.random() * messages.length)];
+};
+
 const SESSION_ID_KEY = 'chat_session_id';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const API_KEY = import.meta.env.VITE_API_KEY;
@@ -28,6 +54,7 @@ const ChatWidget: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [chatState, setChatState] = useState<ChatState>('active');
   const [isRobotAnimating, setIsRobotAnimating] = useState(false);
   const [hasRobotAnimated, setHasRobotAnimated] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -88,6 +115,20 @@ const ChatWidget: React.FC = () => {
       setMessages(prev => [...prev, userMessage]);
     }
     setInput('');
+
+    // If chat is in a disabled state, respond with follow-up message
+    if (chatState !== 'active') {
+      const followUpMessages = chatState === 'sleeping'
+        ? WITTY_MESSAGES.sleeping.followUp
+        : WITTY_MESSAGES.rateLimited.followUp;
+      setMessages(prev => [...prev, {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        text: getRandomMessage(followUpMessages)
+      }]);
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -106,6 +147,29 @@ const ChatWidget: React.FC = () => {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
+
+        // Handle rate limiting (429)
+        if (response.status === 429) {
+          setChatState('rate_limited');
+          setMessages(prev => [...prev, {
+            id: (Date.now() + 1).toString(),
+            role: 'assistant',
+            text: getRandomMessage(WITTY_MESSAGES.rateLimited.initial)
+          }]);
+          return;
+        }
+
+        // Handle service unavailable (503, 502, 500) as sleeping
+        if (response.status >= 500) {
+          setChatState('sleeping');
+          setMessages(prev => [...prev, {
+            id: (Date.now() + 1).toString(),
+            role: 'assistant',
+            text: getRandomMessage(WITTY_MESSAGES.sleeping.initial)
+          }]);
+          return;
+        }
+
         if (response.status === 401) {
           throw new Error('Unauthorized: Invalid API key');
         } else if (response.status === 400) {
@@ -120,6 +184,18 @@ const ChatWidget: React.FC = () => {
       setMessages(prev => [...prev, { id: (Date.now() + 1).toString(), role: 'assistant', text: assistantText }]);
     } catch (error) {
       console.error("Chat Error:", error);
+
+      // Network errors (fetch failed, no connection, CORS, DNS failure, etc.)
+      if (error instanceof TypeError) {
+        setChatState('sleeping');
+        setMessages(prev => [...prev, {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          text: getRandomMessage(WITTY_MESSAGES.sleeping.initial)
+        }]);
+        return;
+      }
+
       const errorMessage = error instanceof Error ? error.message : "Connection error. Please try again later.";
       setMessages(prev => [...prev, { id: (Date.now() + 1).toString(), role: 'assistant', text: errorMessage }]);
     } finally {
@@ -131,6 +207,7 @@ const ChatWidget: React.FC = () => {
     const newSessionId = crypto.randomUUID();
     localStorage.setItem(SESSION_ID_KEY, newSessionId);
     setMessages([]);
+    setChatState('active'); // Reset chat state so user can try again
     hasInitialized.current = false;
   };
 
@@ -138,7 +215,7 @@ const ChatWidget: React.FC = () => {
   useEffect(() => {
     if (isOpen && messages.length === 0 && !hasInitialized.current && !isLoading) {
       hasInitialized.current = true;
-      sendMessage('introduce yourself', false);
+      sendMessage('Hey, please introduce yourself', false);
     }
   }, [isOpen, messages.length, isLoading]);
 
