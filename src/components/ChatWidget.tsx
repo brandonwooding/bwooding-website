@@ -233,7 +233,7 @@ const ChatWidget: React.FC = () => {
   useEffect(() => {
     if (messages.length === 0 && !hasInitialized.current && !isLoading) {
       hasInitialized.current = true;
-      sendMessage('A new user has arrived. Do not react to their appearance - just greet and introduce yourself.', false);
+      sendMessage('A new user has arrived. Greet them and introduce yourself.', false);
     }
   }, [messages.length, isLoading]);
 
