@@ -1,6 +1,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { MessageSquare, X, Minus, Send, Maximize2, RotateCcw } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import Robot from './Robot';
 
 interface Message {
@@ -281,8 +283,12 @@ const ChatWidget: React.FC = () => {
                   m.role === 'user'
                     ? 'bg-primary text-white border-2 border-primary'
                     : 'bg-gray-100 dark:bg-black text-gray-800 dark:text-gray-200 border-2 border-gray-900 dark:border-white'
-                }`}>
-                  {m.text}
+                } ${m.role === 'assistant' ? 'chat-markdown' : ''}`}>
+                  {m.role === 'assistant' ? (
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.text}</ReactMarkdown>
+                  ) : (
+                    m.text
+                  )}
                 </div>
               </div>
             ))}

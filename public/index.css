@@ -1,0 +1,111 @@
+/* Chat markdown styles */
+.chat-markdown p {
+  margin: 0;
+}
+
+.chat-markdown p + p {
+  margin-top: 0.5rem;
+}
+
+.chat-markdown code {
+  background-color: rgba(0, 0, 0, 0.1);
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  font-family: 'JetBrains Mono', 'Courier Prime', monospace;
+  font-size: 0.85em;
+}
+
+.dark .chat-markdown code {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.chat-markdown pre {
+  background-color: rgba(0, 0, 0, 0.05);
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  overflow-x: auto;
+  margin: 0.5rem 0;
+}
+
+.dark .chat-markdown pre {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.chat-markdown pre code {
+  background: none;
+  padding: 0;
+}
+
+.chat-markdown ul,
+.chat-markdown ol {
+  margin: 0.5rem 0;
+  padding-left: 1.25rem;
+}
+
+.chat-markdown ul {
+  list-style-type: disc;
+}
+
+.chat-markdown ol {
+  list-style-type: decimal;
+}
+
+.chat-markdown li {
+  margin: 0.25rem 0;
+}
+
+.chat-markdown a {
+  color: #135bec;
+  text-decoration: underline;
+}
+
+.chat-markdown a:hover {
+  opacity: 0.8;
+}
+
+.chat-markdown strong {
+  font-weight: 600;
+}
+
+.chat-markdown em {
+  font-style: italic;
+}
+
+.chat-markdown blockquote {
+  border-left: 2px solid #135bec;
+  padding-left: 0.75rem;
+  margin: 0.5rem 0;
+  opacity: 0.9;
+}
+
+.chat-markdown h1,
+.chat-markdown h2,
+.chat-markdown h3,
+.chat-markdown h4 {
+  font-weight: 600;
+  margin: 0.5rem 0 0.25rem 0;
+}
+
+.chat-markdown hr {
+  border: none;
+  border-top: 1px solid currentColor;
+  opacity: 0.2;
+  margin: 0.5rem 0;
+}
+
+.chat-markdown table {
+  border-collapse: collapse;
+  margin: 0.5rem 0;
+  font-size: 0.9em;
+}
+
+.chat-markdown th,
+.chat-markdown td {
+  border: 1px solid currentColor;
+  padding: 0.25rem 0.5rem;
+  opacity: 0.9;
+}
+
+.chat-markdown th {
+  font-weight: 600;
+}
