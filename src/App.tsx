@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Page } from '../types';
 import HomeView from './pages/HomeView';
 import ProjectsPlaceholder from './pages/ProjectsPlaceholder';
+import ProjectsView from './pages/ProjectsView';
 import BlogPlaceholder from './pages/BlogPlaceholder';
 import ContactView from './pages/ContactView';
 import Layout from './layout/Layout';
@@ -32,7 +33,7 @@ const App: React.FC = () => {
   const renderContent = () => {
     switch (currentPage) {
       case Page.Projects:
-        return <ProjectsPlaceholder />;
+        return <ProjectsView />;
       case Page.Blog:
         return <BlogPlaceholder />;
       case Page.Contact:

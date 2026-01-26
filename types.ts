@@ -1,11 +1,21 @@
 
+export interface InterestingComponent {
+  title: string;
+  description: string;
+}
+
 export interface Project {
   id: string;
   title: string;
   category: string;
-  description: string;
+  context: string;
   year: string;
-  link: string;
+  summary: string;
+  details: string;
+  techStack: string[];
+  interestingComponents: InterestingComponent[];
+  outcomes: string[];
+  link?: string;
 }
 
 export interface Post {

@@ -1,0 +1,118 @@
+[
+  {
+    "id": "wordle-bot",
+    "title": "Wordle Multi-Agent Bot",
+    "category": "AI Agents",
+    "context": "Personal Project",
+    "year": "2026",
+    "summary": "Developed a multi-agent workflow to play the game Wordle online, using Google Agent Development Kit. The agent has persistent memory to refine its strategy over time.",
+    "details": "The system consists of 4 main agents:\n- Strategy Agent: thinks and decides on which word to play based on available information, and its reasoned strategy.\n- Browser Agent: interacts with the browser (using selenium) to play word.\n- Validation Agent: checks if word has submitted correct, or if game is finished.\n- Interaction Agent: conversational agent to interface with human.\n\nThere are sub-system agents that help support the improvement of the system:\n- Word History Scraper: fetches the history of words that have already been used in Wordle (these do not repeat)\n- Orchestration agents: part of the Google ADK system that help manage the workflow.\n\nOn a given run, the system loops between the strategy agent and the browser agent. The strategy agent suggests a word. The browser agent plays that word and feeds back to the strategy agent the outcome.",
+    "techStack": ["Python", "Google Agent Development Kit (ADK)", "Selenium Web Module"],
+    "interestingComponents": [
+      {
+        "title": "Multi-agent Orchestration",
+        "description": "This system has a pre-determined workflow which simplifies the project. The decomposition of tasks had to be carefully considered. Constraints had to be put in place to make sure the system does not get stuck in loops or exhaust unnecessary tokens."
+      },
+      {
+        "title": "Memory Management",
+        "description": "Short-term memory: within a game, the agent will remember each of its plays and the results from that play. Long-term memory: the agent writes strategy notes that it will refine over time."
+      },
+      {
+        "title": "Tool Use",
+        "description": "Building agent tools within Google Agent Development Kit. Understanding when to use an LLM agent with tools, vs when to use rules based process automation."
+      },
+      {
+        "title": "Web Scraping",
+        "description": "Interacting with websites via selenium. Managing LLM tokens efficiently when using web-scraped data in context."
+      }
+    ],
+    "outcomes": [
+      "Developed first multi-agent solution, practicing tool-use, orchestration, and memory",
+      "Agent is able to solve daily Wordle in 3-4 guesses on average (comparable to human performance)"
+    ]
+  },
+  {
+    "id": "git-assistant",
+    "title": "Agentic Git Assistance (Pacer)",
+    "category": "AI Agents",
+    "context": "UCL AgentVerse Hackathon",
+    "year": "2025",
+    "summary": "Built a prototype git-aware multi-agent system to help developers organise work and actively avoid merge conflicts.",
+    "details": "The agent comes into effect once the features/user stories for a sprint have been agreed. The agent:\n- Breaks user stories down into expected tasks.\n- Proposes delegation of tasks to developers based on their skills profile and history in the repository.\n- Prepares branches for the new features in the repository and assigns branches to developers.\n- Notifies developers of updates over Slack.\n- Prepares a commit plan based on agreed tasks.\n- Monitors local repo live to suggest commits and pre-warn of potential conflicts.\n\nThe goal was to minimise the frustration of merge conflicts - especially those that could be avoided with simple fixes, and better planning. We developed an MVP that was a little rough around the edges, but captured the main features.",
+    "techStack": ["Python", "LangGraph", "Slack"],
+    "interestingComponents": [
+      {
+        "title": "Agentic Tool Use and Integrations",
+        "description": "Many agents in this system performed tool calls to APIs: Slack, GitHub, Bash. Managing / setting up these integrations was tedious but unlocked powerful agentic potential - as agents were given better access to useful data and able to interact conveniently."
+      },
+      {
+        "title": "Multi-agent Framework",
+        "description": "Building in LangGraph provided great learning experience."
+      }
+    ],
+    "outcomes": [
+      "Developed MVP multi-agent solution with working integrations",
+      "1st place in narrative track of competition",
+      "Use case was found to be very interesting to developers, but less engaging to non-technical people",
+      "Brandon gained increased humility (did not win)"
+    ]
+  },
+  {
+    "id": "observability-platform",
+    "title": "Multi-Agent Observability Platform (Tracer)",
+    "category": "AI Agents",
+    "context": "Holistic AI Great Agent Hack",
+    "year": "2025",
+    "summary": "Built a general purpose multi-agent system, optimised for reliability and efficiency. Then built an observability platform around this system that visually mapped the agent runtime actions, and allowed users to query it in natural language.",
+    "details": "- Generic, representative multi-agent solution was a vacation planner - utilised multiple tools for comparing flights, getting activities and preparing agenda within user specifications of location, dates and budget. Developed in LangChain.\n- Hallucination prevention mechanism using semantic entropy calculations to identify potential points of risk, and using LLM as judge to validate information.\n- Model router to efficiently select best model for each agent based on agent task and requirements as well as user's system preferences in terms of speed, costs and sustainability. The router would err towards smaller models for cost and sustainability gains, especially when agents do not have complex responsibilities.\n- Built visual agent runtime map using trace data from LangSmith. Sequence, reasoning and actions taken displayed.\n- Built RAG-query system for trace data. Power-users could ask an LLM about different actions in the trace to surface the reasoning / better understand the run.",
+    "techStack": ["Python", "LangChain", "LangSmith"],
+    "interestingComponents": [
+      {
+        "title": "Agent Observability",
+        "description": "The observability solution could be applied to any multi-agent system to help developers visualise traces and debug with natural language queries."
+      },
+      {
+        "title": "Hallucination Reduction",
+        "description": "Implemented a recent paper (Hallucination Detection on a Budget: Efficient Bayesian Estimation of Semantic Entropy, Kamil Ciosek, Nicolò Felicioni, Sina Ghiassian, Sep 2025) to mathematically estimate points of hallucination risk."
+      },
+      {
+        "title": "Model Router",
+        "description": "Model routers exist for many Generative AI use cases, but Agentic AI has different considerations. It is even more critical for agents to use models that balance cost efficiency, latency and model performance as they can easily bloat token usage or break down with tool-call errors."
+      }
+    ],
+    "outcomes": [
+      "Did not sleep",
+      "Developed functional solution and delivered high-quality demo",
+      "One of few teams to develop a solution that competed in all 3 tracks in the hackathon",
+      "Brandon gained increased humility (did not win)"
+    ]
+  },
+  {
+    "id": "markus-assistant",
+    "title": "Markus AI Sidekick Website Assistant",
+    "category": "AI Agents",
+    "context": "Personal Project",
+    "year": "2026",
+    "summary": "Developed an AI sidekick running locally on an open-source model for my personal website. Markus is tasked to sing my praises and help users navigate the site and its contents. He has grounded details on me and my projects.",
+    "details": "- Markus runs on a mac mini bought off facebook marketplace using a small open-source model (free!)\n- Markus has been fed documents to ground him on his knowledge of his creator (me, Brandon) and my projects.\n- Markus' personality has been engineered to entertain website goers and support his creator.",
+    "techStack": ["TypeScript", "Ollama"],
+    "interestingComponents": [
+      {
+        "title": "Local Inference",
+        "description": "Serving a local model to the internet via Cloudflare tunnel for conversational AI functionality without API costs. Working to maximise performance of smaller open-source models while prioritising latency."
+      },
+      {
+        "title": "Managed Context",
+        "description": "Context is being managed manually at backend. Experimenting with different techniques for efficient context engineering (especially with limited context window)."
+      },
+      {
+        "title": "Document Grounding",
+        "description": "To improve open-source model performance, semantic grounding on source documents is being used."
+      }
+    ],
+    "outcomes": [
+      "Hands-on experience with context engineering, inference in production and document grounding",
+      "Super cool professional hype man"
+    ]
+  }
+]
