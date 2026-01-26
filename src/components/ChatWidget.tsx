@@ -314,7 +314,7 @@ const ChatWidget: React.FC = () => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask me anything..."
-              className="flex-1 bg-white dark:bg-[#16181d] border-2 border-gray-900 dark:border-white px-3 py-2 text-xs focus:outline-none focus:border-primary placeholder:opacity-50"
+              className="flex-1 bg-white dark:bg-[#16181d] border-2 border-gray-900 dark:border-white px-3 py-2 text-base md:text-xs focus:outline-none focus:border-primary placeholder:opacity-50"
             />
             <button
               type="submit"
