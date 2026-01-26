@@ -229,13 +229,13 @@ const ChatWidget: React.FC = () => {
     hasInitialized.current = false;
   };
 
-  // Auto-send intro message when chat opens for the first time
+  // Auto-send intro message when site loads
   useEffect(() => {
-    if (isOpen && messages.length === 0 && !hasInitialized.current && !isLoading) {
+    if (messages.length === 0 && !hasInitialized.current && !isLoading) {
       hasInitialized.current = true;
       sendMessage('A new user has arrived. Do not react to their appearance - just greet and introduce yourself.', false);
     }
-  }, [isOpen, messages.length, isLoading]);
+  }, [messages.length, isLoading]);
 
   if (!isOpen) {
     return (
