@@ -9,7 +9,7 @@ const ContactView: React.FC = () => {
   }, []);
 
   return (
-    <div className="max-w-3xl mx-auto px-6 py-12 animate-in slide-in-from-bottom-4 duration-700">
+    <div className="max-w-4xl mx-auto px-6 py-12 animate-in slide-in-from-bottom-4 duration-700">
       <div className="space-y-8">
         <h2 className="text-4xl md:text-6xl technical-mono tracking-tighter lowercase">contact me</h2>
         <p className="text-gray-500 dark:text-gray-400 leading-relaxed technical-mono max-w-xl">

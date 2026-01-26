@@ -107,6 +107,22 @@ const ChatWidget: React.FC = () => {
     };
   }, [isOpen]);
 
+  // Listen for askMarkus events from other components
+  useEffect(() => {
+    const handleAskMarkus = (e: CustomEvent<{ message: string }>) => {
+      setIsOpen(true);
+      // Small delay to ensure chat is open and initialized
+      setTimeout(() => {
+        sendMessage(e.detail.message);
+      }, 100);
+    };
+
+    window.addEventListener('askMarkus', handleAskMarkus as EventListener);
+    return () => {
+      window.removeEventListener('askMarkus', handleAskMarkus as EventListener);
+    };
+  }, []);
+
   const sendMessage = async (prompt: string, showUserMessage = true) => {
     if (!prompt.trim() || isLoading) return;
 

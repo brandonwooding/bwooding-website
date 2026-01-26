@@ -6,10 +6,11 @@ export interface InterestingComponent {
 
 export interface Project {
   id: string;
+  nickname: string;
   title: string;
   category: string;
   context: string;
-  year: string;
+  date: string;
   summary: string;
   details: string;
   techStack: string[];

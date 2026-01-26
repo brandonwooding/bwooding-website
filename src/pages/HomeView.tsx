@@ -15,7 +15,7 @@ interface HomeViewProps {
 const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
   return (
     <div className="flex flex-col items-center justify-center min-h-[85vh] px-6 py-20 text-center animate-in fade-in duration-1000">
-      <div className="max-w-3xl w-full space-y-12">
+      <div className="max-w-4xl w-full space-y-12">
         <div className="space-y-10">
           <h1 className="technical-mono text-3xl md:text-5xl font-bold tracking-tighter uppercase leading-none">
             Brandon Wooding
