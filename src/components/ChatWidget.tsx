@@ -261,7 +261,7 @@ const ChatWidget: React.FC = () => {
           <span className="technical-mono text-[9px] uppercase tracking-widest font-bold text-white">Markus (Brandon's sidekick)</span>
         </div>
         <div className="flex items-center gap-1">
-          <button onClick={handleNewConversation} className="p-1.5 hover:bg-white/20 border border-transparent hover:border-white text-white" title="New conversation">
+          <button onClick={handleNewConversation} className="hidden p-1.5 hover:bg-white/20 border border-transparent hover:border-white text-white" title="New conversation">
             <RotateCcw size={14} />
           </button>
           <button onClick={() => setIsMinimized(!isMinimized)} className="p-1.5 hover:bg-white/20 border border-transparent hover:border-white text-white" title={isMinimized ? "Maximize" : "Minimize"}>
